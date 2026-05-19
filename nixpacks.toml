@@ -1,15 +1,12 @@
+[providers]
+# On force l'utilisation des providers PHP et Node
+php = {}
+node = {}
+
+[variables]
+# Indique à PHP de ne pas chercher d'extensions complexes vides qui font planter le build
+PHP_EXTENSIONS = ""
+
 [phases.setup]
-nixPkgs = ["php.withExtensions (pe: pe.enabled ++ [])", "nginx", "libmysqlclient", "phpPackages.composer", "nodejs_20", "npm-9_x"]
-
-[phases.install]
-cmds = [
-    "mkdir -p /var/log/nginx && mkdir -p /var/cache/nginx",
-    "composer install --ignore-platform-reqs",
-    "npm i"
-]
-
-[phases.build]
-cmds = ["npm run build"]
-
-[start]
-cmd = "node /assets/scripts/prestart.mjs /assets/nginx.template.conf /nginx.conf && (php-fpm -y /assets/php-fpm.conf & nginx -c /nginx.conf)"
+# On s'assure d'utiliser des versions stables de Node et PHP
+nixPkgs = ["php", "nodejs_20", "nginx", "phpPackages.composer"]
