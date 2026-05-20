@@ -1,12 +1,11 @@
-# Déclare la liste des providers à utiliser (Séquence TOML)
+# On conserve les deux providers
 providers = ["node", "php"]
 
 [variables]
-# Évite le plantage sur la détection automatique des extensions complexes
 PHP_EXTENSIONS = ""
-# C'est ici qu'on force proprement la version globale de Node pour Nixpacks
+# On force la version 20 pour le provider Node natif
 NIXPACKS_NODE_VERSION = "20"
 
 [phases.setup]
-# Vos paquets requis pour l'environnement
-nixPkgs = ["php", "nodejs_20", "nginx", "phpPackages.composer"]
+# IMPORTANT : On retire "nodejs_20" d'ici pour éviter le doublon
+nixPkgs = ["php", "nginx", "phpPackages.composer"]
