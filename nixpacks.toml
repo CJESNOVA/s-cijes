@@ -9,4 +9,4 @@ nixPkgs = ["php", "nodejs_20", "nginx", "phpPackages.composer"]
 
 [start]
 # On lance le serveur embarqué de Laravel sur toutes les interfaces réseau
-cmd = "php artisan serve --host=0.0.0.0 --port=80"
+cmd = "php artisan serve --host=0.0.0.0 --port=8000"
