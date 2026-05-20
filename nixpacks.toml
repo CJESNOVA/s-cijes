@@ -1,12 +1,10 @@
-[providers]
-# On force l'utilisation des providers PHP et Node
-php = {}
-node = {}
+# On liste les providers sous forme de tableau (séquence)
+providers = ["php", "node"]
 
 [variables]
-# Indique à PHP de ne pas chercher d'extensions complexes vides qui font planter le build
+# Évite le plantage sur la détection automatique des extensions complexes
 PHP_EXTENSIONS = ""
 
 [phases.setup]
-# On s'assure d'utiliser des versions stables de Node et PHP
+# Versions stables pour ton environnement
 nixPkgs = ["php", "nodejs_20", "nginx", "phpPackages.composer"]
