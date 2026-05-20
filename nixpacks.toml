@@ -8,3 +8,6 @@ PHP_EXTENSIONS = ""
 [phases.setup]
 # Versions stables pour ton environnement
 nixPkgs = ["php", "nodejs_20", "nginx", "phpPackages.composer"]
+
+[providers.node]
+nodeVersion = "20"
