@@ -1,5 +1,6 @@
-# On liste les providers sous forme de tableau (séquence)
-providers = ["php", "node"]
+[providers]
+node = "20"
+php = "8.2"
 
 [variables]
 # Évite le plantage sur la détection automatique des extensions complexes
@@ -8,6 +9,3 @@ PHP_EXTENSIONS = ""
 [phases.setup]
 # Versions stables pour ton environnement
 nixPkgs = ["php", "nodejs_20", "nginx", "phpPackages.composer"]
-
-[providers.node]
-nodeVersion = "20"
