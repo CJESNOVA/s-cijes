@@ -7,6 +7,6 @@ NIXPACKS_NODE_VERSION = "20"
 [phases.setup]
 nixPkgs = ["php", "nodejs_20", "nginx", "phpPackages.composer"]
 
-# Étape manquante : On définit la commande de démarrage
 [start]
-cmd = "nginx -c /etc/nginx/nginx.conf"
+# On lance PHP-FPM en arrière-plan (-D), puis Nginx au premier plan
+cmd = "php-fpm -D && nginx -g 'daemon off;'"
