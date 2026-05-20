@@ -1,9 +1,10 @@
-# On indique explicitement les deux frameworks/langages du projet
-providers = ["node", "php"]
+# On désactive la détection automatique qui crée les conflits
+providers = []
 
 [variables]
-# Force la version de Node sur le provider natif
+PHP_EXTENSIONS = ""
 NIXPACKS_NODE_VERSION = "20"
 
-# Permet d'éviter les crashs de détection automatique d'extensions PHP complexes
-PHP_EXTENSIONS = ""
+[phases.setup]
+# On force l'installation de TOUT l'environnement dans une seule et unique passe Nix
+nixPkgs = ["php", "nodejs_20", "nginx", "phpPackages.composer"]
