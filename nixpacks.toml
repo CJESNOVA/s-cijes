@@ -1,4 +1,3 @@
-# On désactive la détection automatique qui crée les conflits
 providers = []
 
 [variables]
@@ -6,5 +5,8 @@ PHP_EXTENSIONS = ""
 NIXPACKS_NODE_VERSION = "20"
 
 [phases.setup]
-# On force l'installation de TOUT l'environnement dans une seule et unique passe Nix
 nixPkgs = ["php", "nodejs_20", "nginx", "phpPackages.composer"]
+
+# Étape manquante : On définit la commande de démarrage
+[start]
+cmd = "nginx -c /etc/nginx/nginx.conf"
