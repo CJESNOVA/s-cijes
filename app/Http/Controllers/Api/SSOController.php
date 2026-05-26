@@ -14,46 +14,64 @@ use Illuminate\Support\Facades\Auth;
 class SSOController extends Controller
 {
     public function callback(Request $request)
-    {
-        // 1. Récupération du token depuis l'URL (ex: ?token=xxxx)
-        $token = $request->query('token');
-        if (!$token) return response()->json(['error' => 'Token manquant'], 400);
+{
+    $token = $request->query('token');
 
-        try {
-            // 2. Pré-décodage non vérifié pour identifier la plateforme
-            // On décode sans vérifier juste pour lire le "plateforme_code" dans le payload
-            $tks = explode('.', $token);
-            $payload = json_decode(base64_decode($tks[1]));
-            
-            $plateforme = Plateforme::where('code', $payload->plateforme_code)->firstOrFail();
-
-            // 3. Vérification réelle de la signature avec la clé secrète de la plateforme
-            $decoded = JWT::decode($token, new Key($plateforme->secret_key, 'HS256'));
-
-            // 4. Stratégie "Get or Create" (Auto-provisioning)
-            // On cherche l'utilisateur par son ID externe ET sa plateforme
-            $user = User::updateOrCreate(
-                [
-                    'plateforme_id' => $plateforme->id,
-                    'externe_id' => $decoded->user_id
-                ],
-                [
-                    'nom' => $decoded->nom,
-                    'prenom' => $decoded->prenom,
-                    'email' => $decoded->email,
-                    'role_id' => Role::where('titre', 'Demandeur')->first()->id, // Rôle par défaut
-                    'last_login_at' => now(),
-                ]
-            );
-
-            // 5. Connexion de l'utilisateur dans la session Laravel
-            Auth::login($user);
-
-            // 6. Redirection vers le tableau de bord
-            return redirect()->route('dashboard');
-
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Authentification échouée : ' . $e->getMessage()], 401);
-        }
+    if (!$token) {
+        return response()->json(['error' => 'Token manquant'], 400);
     }
+
+    try {
+
+        // Décodage NON sécurisé juste pour identifier la plateforme
+        $payloadUnsafe = json_decode(
+            base64_decode(strtr(explode('.', $token)[1], '-_', '+/'))
+        );
+
+        if (!isset($payloadUnsafe->plateforme_code)) {
+            return response()->json(['error' => 'Token invalide'], 400);
+        }
+
+        $plateforme = Plateforme::where('code', $payloadUnsafe->plateforme_code)->first();
+
+        if (!$plateforme) {
+            return response()->json(['error' => 'Plateforme inconnue'], 404);
+        }
+
+        // Vérification signature
+        $decoded = JWT::decode(
+            $token,
+            new Key($plateforme->secret_key, 'HS256')
+        );
+//dd($decoded);
+        $role = Role::where('titre', 'Demandeur')->first();
+
+        if (!$role) {
+            return response()->json(['error' => 'Rôle introuvable'], 500);
+        }
+
+        $user = User::updateOrCreate(
+            [
+                'plateforme_id' => $plateforme->id,
+                'email' => $decoded->email
+            ],
+            [
+                'nom' => $decoded->nom,
+                'prenom' => $decoded->prenom,
+                'role_id' => $role->id,
+                'externe_id' => $decoded->user_id || 0,
+                'last_login_at' => now(),
+            ]
+        );
+
+        Auth::login($user, true);
+
+        return redirect()->route('dashboard');
+
+    } catch (\Firebase\JWT\ExpiredException $e) {
+        return response()->json(['error' => 'Token expiré'], 401);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Authentification échouée : ' . $e->getMessage()], 401);
+    }
+}
 }
