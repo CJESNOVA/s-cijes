@@ -40,7 +40,7 @@ class NotificationsController extends Controller
         
         // Types disponibles pour les filtres
         $types = $user->notifications()
-            ->select('type', \DB::raw('count(*) as count'))
+            ->select('type', DB::raw('count(*) as count'), DB::raw('MAX(created_at) as latest_created_at'))
             ->groupBy('type')
             ->orderBy('count', 'desc')
             ->get();
