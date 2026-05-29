@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('password')->nullable();
             $table->timestamp('last_login_at')->nullable();
             $table->boolean('etat')->default(true);
-            $table->unique(['plateforme_id', 'externe_id']); // Sécurité SSO
+            //$table->unique(['plateforme_id', 'externe_id']); // Sécurité SSO
             $table->rememberToken();
             $table->timestamps();
         });
